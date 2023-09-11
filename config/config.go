@@ -23,7 +23,7 @@ type MongoDB struct {
 	User       string `env:"USER" env-default:"mongodb"`
 	Password   string `env:"PASSWORD" env-default:"mongodb"`
 	DBName     string `env:"DB_NAME" env-default:"mongodb"`
-	Collection string `env:"COLLECTION" env-default:"hesh_refresh_token"`
+	Collection string `env:"COLLECTION" env-default:"refresh_token"`
 }
 
 type JWT struct {
