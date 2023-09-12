@@ -16,16 +16,16 @@ var ErrCreateClientMongodb = errors.New("failed to create client to mongodb due 
 func New(ctx context.Context, cfg *config.MongoDB) (*mongo.Database, error) {
 	dbURL := fmt.Sprintf("mongodb://%s:%s@%s:%s", cfg.User, cfg.Password, cfg.Host, cfg.Port)
 
-	//Connect mongodb
+	// Connect mongodb
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbURL))
 	if err != nil {
 		return nil, fmt.Errorf("%w %w", ErrCreateClientMongodb, err)
 	}
 
-	//Ping mongodb
-	ctx1, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	// Ping mongodb
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	if err := client.Ping(ctx1, nil); err != nil {
+	if err := client.Ping(ctx, nil); err != nil {
 		return nil, fmt.Errorf("%w %w", ErrCreateClientMongodb, err)
 	}
 
