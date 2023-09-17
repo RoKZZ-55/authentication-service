@@ -4,21 +4,23 @@ import (
 	"authentication-service/config"
 	"authentication-service/internal/apiserver"
 	"authentication-service/pkg/logger/sl"
-
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 func main() {
 	cfg := config.GetConfig()
 
-	log := sl.GetLogger(cfg.LogLevel)
+	if err := sl.GetLogger(cfg.LogLevel); err != nil {
+		slog.Error("failed to init the logger", sl.Err(err))
+		return
+	}
 
-	log.Info(
+	slog.Info(
 		"starting authentication-service",
 		slog.String("LogLevel", cfg.LogLevel),
 	)
 
-	if err := apiserver.Run(cfg, log); err != nil {
-		log.Error("apiserver error:", sl.Err(err))
+	if err := apiserver.Run(cfg); err != nil {
+		slog.Error("apiserver error", sl.Err(err))
 	}
 }

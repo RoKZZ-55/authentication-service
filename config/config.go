@@ -9,7 +9,7 @@ import (
 type Config struct {
 	APIServer
 	MongoDB
-	JWT
+	TokenPair
 }
 
 type APIServer struct {
@@ -23,15 +23,14 @@ type MongoDB struct {
 	User       string `env:"USER" env-default:"mongodb"`
 	Password   string `env:"PASSWORD" env-default:"mongodb"`
 	DBName     string `env:"DB_NAME" env-default:"mongodb"`
-	Collection string `env:"COLLECTION" env-default:"refresh_token"`
+	Collection string `env:"COLLECTION" env-default:"user_authentication"`
 }
 
-type JWT struct {
-	SecretKeyAccess  string `env:"SECRET_KEY_ACCESS" env-default:"key123"`
-	SecretKeyRefresh string `env:"SECRET_KEY_REFRESH" env-default:"key321"`
+type TokenPair struct {
+	AccessSecretKey string `env:"ACCESS_SECRET_KEY" env-default:"key123"`
 
 	//token lifetime in minutes
-	AccessTokenLifetime  int `env:"ACCESS_TOKEN_LIFETIME" env-default:"240"`     // 240 minutes
+	AccessTokenLifetime  int `env:"ACCESS_TOKEN_LIFETIME" env-default:"30"`      // 30 minutes
 	RefreshTokenLifetime int `env:"REFRESH_TOKEN_LIFETIME" env-default:"525600"` // 365 days
 }
 
