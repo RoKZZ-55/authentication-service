@@ -1,14 +1,16 @@
 package sl
 
 import (
+	"errors"
+	"log/slog"
 	"os"
-
-	"golang.org/x/exp/slog"
 )
 
 const (
 	levelDebug = "debug"
 	levelInfo  = "info"
+	levelWarn  = "warn"
+	levelError = "error"
 )
 
 func Err(err error) slog.Attr {
@@ -18,7 +20,7 @@ func Err(err error) slog.Attr {
 	}
 }
 
-func GetLogger(LogLevel string) *slog.Logger {
+func GetLogger(LogLevel string) error {
 	var log *slog.Logger
 
 	switch LogLevel {
@@ -30,11 +32,23 @@ func GetLogger(LogLevel string) *slog.Logger {
 		log = slog.New(
 			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
 		)
+	case levelWarn:
+		log = slog.New(
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelWarn}),
+		)
+	case levelError:
+		log = slog.New(
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelError}),
+		)
 	default:
 		log = slog.New(
-			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelError}),
 		)
-		log.Error("config log level is incorrect", "default info log levl is used", levelInfo)
+		slog.SetDefault(log)
+		return errors.New("incorrectly specified log level, possible alloy levels: debug, info, warn, error")
 	}
-	return log
+
+	slog.SetDefault(log)
+
+	return nil
 }
