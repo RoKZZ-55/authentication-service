@@ -1,16 +1,16 @@
 package handler
 
 import (
-	"authentication-service/internal/service"
+	"authentication-service/internal/storage"
 )
 
 type Handler struct {
-	service               service.Service
+	storage               *storage.Storage
 	AuthenticationHandler *AuthenticationHandler
 }
 
-func New(service service.Service) *Handler {
+func New(storage *storage.Storage) *Handler {
 	return &Handler{
-		service: service,
+		storage: storage,
 	}
 }
