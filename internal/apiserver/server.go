@@ -1,21 +1,21 @@
 package apiserver
 
 import (
+	"authentication-service/internal/handler"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"golang.org/x/exp/slog"
 )
 
 type Server struct {
-	router *chi.Mux
-	log    *slog.Logger
+	router  *chi.Mux
+	handler *handler.Handler
 }
 
-func New(log *slog.Logger) *Server {
+func New(handler *handler.Handler) *Server {
 	s := &Server{
-		router: chi.NewRouter(),
-		log:    log,
+		router:  chi.NewRouter(),
+		handler: handler,
 	}
 
 	s.configureRouter()

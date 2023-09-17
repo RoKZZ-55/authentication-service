@@ -2,16 +2,16 @@ package apiserver
 
 import (
 	"authentication-service/config"
-	"authentication-service/internal/storage/storage"
+	"authentication-service/internal/handler"
+	"authentication-service/internal/storage"
 	"authentication-service/pkg/db/mongodb"
 	"context"
+	"log/slog"
 	"net/http"
-
-	"golang.org/x/exp/slog"
 )
 
-func Run(cfg *config.Config, log *slog.Logger) error {
-	log.Info(
+func Run(cfg *config.Config) error {
+	slog.Info(
 		"init monogdb",
 		slog.String("Host", cfg.Host),
 		slog.String("Port", cfg.Port),
@@ -28,15 +28,16 @@ func Run(cfg *config.Config, log *slog.Logger) error {
 
 	defer func() {
 		if err := db.Client().Disconnect(ctx); err != nil {
-			log.Error("database disconnect error", err)
+			slog.Error("database disconnect error", err)
 		}
 	}()
 
-	storage.New(db)
+	storage := storage.New(db, cfg)
+	handler := handler.New(storage)
 
 	// getting router and routes for server
-	srv := New(log)
-	log.Info(
+	srv := New(handler)
+	slog.Info(
 		"server start",
 		slog.String("BindAddr", cfg.BindAddr),
 	)
