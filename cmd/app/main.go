@@ -21,6 +21,6 @@ func main() {
 	)
 
 	if err := apiserver.Run(cfg); err != nil {
-		slog.Error("apiserver error", sl.Err(err))
+		slog.Error("error in the http.ListenAndServe function in the apiserver package", sl.Err(err))
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"authentication-service/internal/handler"
 	"authentication-service/internal/storage"
 	"authentication-service/pkg/db/mongodb"
+	"authentication-service/pkg/logger/sl"
 	"context"
 	"log/slog"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 
 func Run(cfg *config.Config) error {
 	slog.Info(
-		"init monogdb",
+		"init mongodb",
 		slog.String("Host", cfg.Host),
 		slog.String("Port", cfg.Port),
 		slog.String("DBName", cfg.DBName),
@@ -23,12 +24,13 @@ func Run(cfg *config.Config) error {
 	// connect to mongodb and check connection
 	db, err := mongodb.New(ctx, &cfg.MongoDB)
 	if err != nil {
-		return err
+		slog.Error("mongodb init error", sl.Err(err))
+		return nil
 	}
 
 	defer func() {
 		if err := db.Client().Disconnect(ctx); err != nil {
-			slog.Error("database disconnect error", err)
+			slog.Error("database disconnect error", sl.Err(err))
 		}
 	}()
 

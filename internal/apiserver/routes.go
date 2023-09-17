@@ -10,6 +10,6 @@ func (s *Server) configureRouter() {
 	s.router.Use(s.LogRequest())
 
 	// authentication routes
-	s.router.Get("/authentication-service/get-tokens/{uuid}", s.handler.GetToken())
+	s.router.Get("/authentication-service/get-tokens/{guid}", s.handler.GetToken())
 	s.router.Get("/authentication-service/refresh-tokens", s.handler.RefreshToken())
 }

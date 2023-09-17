@@ -13,10 +13,6 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-var (
-	ErrUserNotFound = errors.New("user not found")
-)
-
 type Response struct {
 	AccessToken  string `json:"access-token"`
 	RefreshToken string `json:"refresh-token"`
@@ -27,12 +23,12 @@ func (h *Handler) GetToken() http.HandlerFunc {
 		ctx := context.TODO()
 
 		userAuthentication := &model.UserAuthentication{
-			UUID: chi.URLParam(r, "uuid"),
+			GUID: chi.URLParam(r, "guid"),
 		}
 
-		if err := validator.New().Var(userAuthentication.UUID, "uuid"); err != nil {
-			slog.Error("user uuid validation error", sl.Err(err))
-			response.Error(w, http.StatusBadRequest, errors.New("incorrect uuid"))
+		if err := validator.New().Var(userAuthentication.GUID, "uuid"); err != nil {
+			slog.Error("user guid validation error", sl.Err(err))
+			response.Error(w, http.StatusBadRequest, errors.New("invalid guid"))
 			return
 		}
 

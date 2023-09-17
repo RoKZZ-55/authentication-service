@@ -1,14 +1,20 @@
 package storage
 
-import "go.mongodb.org/mongo-driver/mongo"
+import (
+	"authentication-service/config"
+
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type Storage struct {
 	db                    *mongo.Database
+	cfg                   *config.Config
 	authenticationStorage *AuthenticationStorage
 }
 
-func New(db *mongo.Database) *Storage {
+func New(db *mongo.Database, cfg *config.Config) *Storage {
 	return &Storage{
-		db: db,
+		db:  db,
+		cfg: cfg,
 	}
 }

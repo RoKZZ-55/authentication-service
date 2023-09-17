@@ -2,9 +2,10 @@ package storage
 
 import (
 	"authentication-service/internal/model"
+	"context"
 )
 
 type AuthenticationStorage interface {
-	GetToken(authentication *model.Token) error
-	RefreshToken(authentication *model.Token) error
+	GetToken(ctx context.Context, userAuthentication *model.UserAuthentication) error
+	RefreshToken(ctx context.Context, userAuthentication *model.UserAuthentication) error
 }
