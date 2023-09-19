@@ -1,0 +1,29 @@
+services:
+  authentication-service:
+    image: authentication-service:latest
+    container_name: authentication-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - 8080:8080
+
+  mongo:
+    image: mongo:7.0.1
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: mongodb
+      MONGO_INITDB_ROOT_USERNAME: mongodb
+      MONGO_INITDB_ROOT_PASSWORD: mongodb
+    volumes:
+      - mongo_storage:/var/liv/mongo/data
+
+
+volumes:
+  mongo_storage:
