@@ -14,7 +14,7 @@ type Config struct {
 
 type APIServer struct {
 	LogLevel string `env:"LOG_LEVEL" env-default:"info"`
-	BindAddr string `env:"BIND_ADDR" env-default:"localhost:8080"`
+	BindAddr string `env:"BIND_ADDR" env-default:":8080"`
 }
 
 type MongoDB struct {
