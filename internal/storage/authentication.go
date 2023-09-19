@@ -24,7 +24,7 @@ import (
 var (
 	ErrTokenNotValid     = errors.New("token is not valid")
 	ErrUserNotFound      = errors.New("user not found")
-	ErrUnexpected        = errors.New("unexpected server error")
+	ErrInternal          = errors.New("unexpected server error")
 	ErrWrongRefreshToken = errors.New("wrong refresh token")
 )
 
@@ -36,7 +36,7 @@ type createAndUpdateHashParameters struct {
 }
 
 // validExpRefreshToken token lifetime check
-func (s *Storage) validExpRefreshToken(expStr string) error {
+func validExpRefreshToken(expStr string) error {
 	exp, err := strconv.Atoi(expStr)
 
 	if err != nil || int64(exp) < time.Now().Unix() {
@@ -66,7 +66,7 @@ func (s *Storage) createAccessAndRefreshToken(userAuthentication *model.UserAuth
 	userAuthentication.AccessToken, err = token.SignedString([]byte(s.cfg.AccessSecretKey))
 	if err != nil {
 		slog.Error("error creating access token", sl.Err(err))
-		return ErrUnexpected
+		return ErrInternal
 	}
 
 	// creation of a new refresh token
@@ -83,7 +83,7 @@ func createAndUpdateHash(ctx context.Context, p *createAndUpdateHashParameters) 
 	refreshTokenHash, err := bcrypt.GenerateFromPassword([]byte(p.refreshToken), 7)
 	if err != nil {
 		slog.Error("error of creating bcrypt hash refresh token", sl.Err(err))
-		return ErrUnexpected
+		return ErrInternal
 	}
 
 	// updating token guid and token refresh hash in the database
@@ -95,7 +95,7 @@ func createAndUpdateHash(ctx context.Context, p *createAndUpdateHashParameters) 
 
 	if err != nil {
 		slog.Error("error of updating the database document by filter", sl.Err(err))
-		return ErrUnexpected
+		return ErrInternal
 	}
 
 	return nil
@@ -116,7 +116,7 @@ func (s *Storage) GetToken(ctx context.Context, userAuthentication *model.UserAu
 		}
 
 		slog.Error("error of finding a document by user guid", sl.Err(err))
-		return ErrUnexpected
+		return ErrInternal
 	}
 
 	if err := s.createAccessAndRefreshToken(userAuthentication); err != nil {
@@ -143,14 +143,14 @@ func (s *Storage) RefreshToken(ctx context.Context, userAuthentication *model.Us
 	refreshTokenByte, err := base64.StdEncoding.DecodeString(userAuthentication.RefreshToken)
 	if err != nil {
 		slog.Error("error decoding refresh token from base64 to []byte", sl.Err(err))
-		return ErrUnexpected
+		return ErrInternal
 	}
 
 	refreshTokenString := string(refreshTokenByte)
 	refreshTokenSplit := strings.Split(refreshTokenString, "/")
 
 	// token lifetime check
-	if err := s.validExpRefreshToken(refreshTokenSplit[0]); err != nil {
+	if err := validExpRefreshToken(refreshTokenSplit[0]); err != nil {
 		return err
 	}
 
@@ -168,14 +168,14 @@ func (s *Storage) RefreshToken(ctx context.Context, userAuthentication *model.Us
 		}
 
 		slog.Error("error of finding a document by token guid", sl.Err(err))
-		return ErrUnexpected
+		return ErrInternal
 
 	}
 
 	pb, ok := result["refresh_token_hash"].(primitive.Binary)
 	if !ok {
 		slog.Error("data type is not primitive.Binary", slog.Any("refresh_token_hash", result["refresh_token_hash"]))
-		return ErrUnexpected
+		return ErrInternal
 	}
 
 	if err = bcrypt.CompareHashAndPassword(pb.Data, []byte(refreshTokenString)); err != nil {
@@ -185,7 +185,7 @@ func (s *Storage) RefreshToken(ctx context.Context, userAuthentication *model.Us
 		}
 
 		slog.Error("error comparing refresh token and its hash from the database", sl.Err(err))
-		return ErrUnexpected
+		return ErrInternal
 	}
 
 	if err := s.createAccessAndRefreshToken(userAuthentication); err != nil {

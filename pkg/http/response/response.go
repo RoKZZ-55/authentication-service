@@ -8,7 +8,7 @@ import (
 
 // Error fills the response body with an error and redirects the data to the responder
 func Error(w http.ResponseWriter, code int, err error) {
-	if errors.Is(err, errors.New("unexpected server error")) {
+	if errors.Is(err, errors.New("internal server error")) {
 		code = http.StatusInternalServerError
 	}
 	Respond(w, code, map[string]string{"error": err.Error()})
